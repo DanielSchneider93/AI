@@ -5,7 +5,7 @@ import lenz.htw.sawhian.Move;
 
 public class CalculateMoves {
 
-	public List<PossibleMove> calculateBestMove(int playerNumber, int[][] board, IntegrateMove ig) {
+	public CalculationResult calculateBestMove(int playerNumber, int[][] board, IntegrateMove ig) {
 		List<PossibleMove> moves = getPossibleMoves(playerNumber, board, ig);
 
 		if (moves.size() == 0) {
@@ -31,8 +31,9 @@ public class CalculateMoves {
 			System.out.println("Possible Move: x: " + m.x + " y: " + m.y + " value: " + value);
 			 //TODO: return values and put it into alpha beta
 		}
-
-		return moves;
+		
+		CalculationResult cs = new CalculationResult(values, moves);
+		return cs;
 	}
 
 	public List<PossibleMove> getPossibleMoves(int playerNumber, int[][] board, IntegrateMove ig) {

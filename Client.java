@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -54,13 +55,14 @@ public class Client {
 
 			if (move == null) {
 				//TODO: 
-				List<PossibleMove> pm = cv.calculateBestMove(playerNumber, board, ig);
+				CalculationResult cs = cv.calculateBestMove(playerNumber, board, ig);
+				List<PossibleMove> pm = cs.moves;
 				//int result = alphaBeta(0, 0, true, values, -10000, 10000);
 				
+				Integer maxVal = Collections.max(cs.values);
+				Integer maxIdx = cs.values.indexOf(maxVal);
 				
-				
-				
-				Move m = new Move(playerNumber, pm.get(0).x, pm.get(0).y);
+				Move m = new Move(playerNumber, pm.get(maxIdx).x, pm.get(maxIdx).y);
 				//System.out.println("My Move is: x: " + pm.x + " y: " + pm.y);
 				client.sendMove(m);
 			} else {
