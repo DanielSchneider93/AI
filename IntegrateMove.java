@@ -1,7 +1,7 @@
 import lenz.htw.sawhian.Move;
 
 public class IntegrateMove {
-	
+
 	int pointsP1 = 0;
 	int pointsP2 = 0;
 	int pointsP3 = 0;
@@ -12,153 +12,309 @@ public class IntegrateMove {
 	int unusedStonesP3 = 7;
 	int unusedStonesP4 = 7;
 
-	public void integrateMove(Move move, int[][] board) {
+	public int integrateMove(Move move, int[][] board, boolean isRealMove) {
 
-		// System.out.println("before integration: ");
-		// displayMatrix(7, board);
+		if (isRealMove) {
+			// System.out.println("before integration: ");
+			// displayMatrix(7, board);
 
-		// integrate move for player 1 (0)
-		if (move.player == 0) {
+			// integrate move for player 1 (0)
+			if (move.player == 0) {
 
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				removeStoneFromStack(move.player);
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					removeStoneFromStack(move.player);
 
-			} else if (move.y + 1 > 6) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				addPoint(move.player);
-
-			} else if (board[move.x][move.y + 1] == -1) {
-				// next field is free
-				board[move.x][move.y] = -1;
-				board[move.x][move.y + 1] = move.player;
-
-			} else {
-				// next field is occupied and not by our own stone
-				int jumpCount = jumpCheckP1(move, board);
-				System.out.println("Jump Counter: " + jumpCount);
-
-				if (move.y + jumpCount > 6) {
-					// jump ends with putting stone off the field
+				} else if (move.y + 1 > 6) {
+					// stone is at goal
 					board[move.x][move.y] = -1;
 					addPoint(move.player);
-				} else {
-					// stone is on the field after jump
+
+				} else if (board[move.x][move.y + 1] == -1) {
+					// next field is free
 					board[move.x][move.y] = -1;
-					board[move.x][move.y + jumpCount] = move.player;
+					board[move.x][move.y + 1] = move.player;
+
+				} else {
+					// next field is occupied and not by our own stone
+					int jumpCount = jumpCheckP1(move, board);
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.y + jumpCount > 6) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						addPoint(move.player);
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x][move.y + jumpCount] = move.player;
+					}
 				}
 			}
-		}
 
-		// integrate move for player 2 (1)
-		if (move.player == 1) {
+			// integrate move for player 2 (1)
+			if (move.player == 1) {
 
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				removeStoneFromStack(move.player);
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					removeStoneFromStack(move.player);
 
-			} else if (move.x + 1 > 6) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				addPoint(move.player);
-
-			} else if (board[move.x + 1][move.y] == -1) {
-				// next field is free
-				board[move.x][move.y] = -1;
-				board[move.x + 1][move.y] = move.player;
-
-			} else {
-				// next field is occupied, check if we can jump
-				int jumpCount = jumpCheckP2(move, board);
-				System.out.println("Jump Counter: " + jumpCount);
-
-				if (move.x + jumpCount >= 7) {
-					// jump ends with putting stone off the field
+				} else if (move.x + 1 > 6) {
+					// stone is at goal
 					board[move.x][move.y] = -1;
 					addPoint(move.player);
-				} else {
-					// stone is on the field after jump
+
+				} else if (board[move.x + 1][move.y] == -1) {
+					// next field is free
 					board[move.x][move.y] = -1;
-					board[move.x + jumpCount][move.y] = move.player;
+					board[move.x + 1][move.y] = move.player;
+
+				} else {
+					// next field is occupied, check if we can jump
+					int jumpCount = jumpCheckP2(move, board);
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.x + jumpCount >= 7) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						addPoint(move.player);
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x + jumpCount][move.y] = move.player;
+					}
 				}
 			}
-		}
 
-		// integrate move for player 3 (2)
-		if (move.player == 2) {
+			// integrate move for player 3 (2)
+			if (move.player == 2) {
 
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				removeStoneFromStack(move.player);
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					removeStoneFromStack(move.player);
 
-			} else if (move.y - 1 < 0) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				addPoint(move.player);
-
-			} else if (board[move.x][move.y - 1] == -1) {
-				// next field is free
-				board[move.x][move.y] = -1;
-				board[move.x][move.y - 1] = move.player;
-
-			} else {
-				// next field is occupied, check if we can jump
-				int jumpCount = jumpCheckP3(move, board);
-				System.out.println("Jump Counter: " + jumpCount);
-
-				if (move.y - jumpCount < 0) {
-					// jump ends with putting stone off the field
+				} else if (move.y - 1 < 0) {
+					// stone is at goal
 					board[move.x][move.y] = -1;
 					addPoint(move.player);
-				} else {
-					// stone is on the field after jump
+
+				} else if (board[move.x][move.y - 1] == -1) {
+					// next field is free
 					board[move.x][move.y] = -1;
-					board[move.x][move.y - jumpCount] = move.player;
+					board[move.x][move.y - 1] = move.player;
+
+				} else {
+					// next field is occupied, check if we can jump
+					int jumpCount = jumpCheckP3(move, board);
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.y - jumpCount < 0) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						addPoint(move.player);
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x][move.y - jumpCount] = move.player;
+					}
 				}
 			}
-		}
 
-		// integrate move for player 4 (3)
-		if (move.player == 3) {
+			// integrate move for player 4 (3)
+			if (move.player == 3) {
 
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				removeStoneFromStack(move.player);
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					removeStoneFromStack(move.player);
 
-			} else if (move.x - 1 < 0) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				addPoint(move.player);
-
-			} else if (board[move.x - 1][move.y] == -1) {
-				// next field is free
-				board[move.x][move.y] = -1;
-				board[move.x - 1][move.y] = move.player;
-
-			} else {
-				// next field is occupied, check if we can jump
-				int jumpCount = jumpCheckP4(move, board);
-				System.out.println("Jump Counter: " + jumpCount);
-
-				if (move.x - jumpCount < 0) {
-					// jump ends with putting stone off the field
+				} else if (move.x - 1 < 0) {
+					// stone is at goal
 					board[move.x][move.y] = -1;
 					addPoint(move.player);
-				} else {
-					// stone is on the field after jump
+
+				} else if (board[move.x - 1][move.y] == -1) {
+					// next field is free
 					board[move.x][move.y] = -1;
-					board[move.x - jumpCount][move.y] = move.player;
+					board[move.x - 1][move.y] = move.player;
+
+				} else {
+					// next field is occupied, check if we can jump
+					int jumpCount = jumpCheckP4(move, board);
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.x - jumpCount < 0) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						addPoint(move.player);
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x - jumpCount][move.y] = move.player;
+					}
 				}
 			}
-		}
 
-		// System.out.println("after integration: ");
-		displayMatrix(7, board);
+			// System.out.println("after integration: ");
+			displayMatrix(7, board);
+			
+			return 0;
+		} else {
+			//not a real move, so dont save point and stackcount but return calculation of how good this turn is
+			int valueCount = 0;
+			
+			if (move.player == 0) {
+
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					valueCount++;
+
+				} else if (move.y + 1 > 6) {
+					// stone is at goal
+					board[move.x][move.y] = -1;
+					valueCount = valueCount + 4;
+
+				} else if (board[move.x][move.y + 1] == -1) {
+					// next field is free
+					board[move.x][move.y] = -1;
+					board[move.x][move.y + 1] = move.player;
+					valueCount++;
+
+				} else {
+					// next field is occupied and not by our own stone
+					int jumpCount = jumpCheckP1(move, board);
+					valueCount = valueCount + jumpCount;
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.y + jumpCount > 6) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						valueCount++;
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x][move.y + jumpCount] = move.player;
+					}
+				}
+			}
+
+			// integrate move for player 2 (1)
+			if (move.player == 1) {
+
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					valueCount++;
+
+				} else if (move.x + 1 > 6) {
+					// stone is at goal
+					board[move.x][move.y] = -1;
+					valueCount = valueCount + 4;
+
+				} else if (board[move.x + 1][move.y] == -1) {
+					// next field is free
+					board[move.x][move.y] = -1;
+					board[move.x + 1][move.y] = move.player;
+					valueCount++;
+
+				} else {
+					// next field is occupied, check if we can jump
+					int jumpCount = jumpCheckP2(move, board);
+					valueCount = valueCount + jumpCount;
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.x + jumpCount >= 7) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						valueCount++;
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x + jumpCount][move.y] = move.player;
+					}
+				}
+			}
+
+			// integrate move for player 3 (2)
+			if (move.player == 2) {
+
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					valueCount++;
+
+				} else if (move.y - 1 < 0) {
+					// stone is at goal
+					board[move.x][move.y] = -1;
+					valueCount = valueCount + 4;
+
+				} else if (board[move.x][move.y - 1] == -1) {
+					// next field is free
+					board[move.x][move.y] = -1;
+					board[move.x][move.y - 1] = move.player;
+					valueCount++;
+
+				} else {
+					// next field is occupied, check if we can jump
+					int jumpCount = jumpCheckP3(move, board);
+					valueCount = valueCount + jumpCount;
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.y - jumpCount < 0) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						valueCount++;
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x][move.y - jumpCount] = move.player;
+					}
+				}
+			}
+
+			// integrate move for player 4 (3)
+			if (move.player == 3) {
+
+				if (board[move.x][move.y] == -1) {
+					// field is empty, place stone on it
+					board[move.x][move.y] = move.player;
+					valueCount++;
+
+				} else if (move.x - 1 < 0) {
+					// stone is at goal
+					board[move.x][move.y] = -1;
+					valueCount = valueCount + 4;
+
+				} else if (board[move.x - 1][move.y] == -1) {
+					// next field is free
+					board[move.x][move.y] = -1;
+					board[move.x - 1][move.y] = move.player;
+					valueCount++;
+
+				} else {
+					// next field is occupied, check if we can jump
+					int jumpCount = jumpCheckP4(move, board);
+					valueCount = valueCount + jumpCount;
+					System.out.println("Jump Counter: " + jumpCount);
+
+					if (move.x - jumpCount < 0) {
+						// jump ends with putting stone off the field
+						board[move.x][move.y] = -1;
+						valueCount++;
+					} else {
+						// stone is on the field after jump
+						board[move.x][move.y] = -1;
+						board[move.x - jumpCount][move.y] = move.player;
+					}
+				}
+			}
+
+			return valueCount;
+		}
 	}
 
 	private int jumpCheckP1(Move move, int[][] board) {

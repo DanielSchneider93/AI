@@ -1,19 +1,37 @@
 import java.util.ArrayList;
 import java.util.List;
 
-public class CalculateMoves {
-	
-	public List<PossibleMove> calculateBestMove(int playerNumber, int[][] board, IntegrateMove ig) {
-		List<PossibleMove> moves = getPossibleMoves(playerNumber, board,ig);
+import lenz.htw.sawhian.Move;
 
-		// for (PossibleMove m : moves) {
-		// System.out.println("Possible Move: x: " + m.x + " y: " + m.y);
-		// }
+public class CalculateMoves {
+
+	public List<PossibleMove> calculateBestMove(int playerNumber, int[][] board, IntegrateMove ig) {
+		List<PossibleMove> moves = getPossibleMoves(playerNumber, board, ig);
 
 		if (moves.size() == 0) {
 			System.out.println("No Moves Possible anymore!");
 		}
-		
+
+		ArrayList<Integer> values = new ArrayList<Integer>();
+
+		// Calculate the value of each turn and save it into values List
+		for (PossibleMove pm : moves) {
+
+			// create duplicate of actual board state
+			int[][] board_temp = new int[board.length][];
+			
+			for (int i = 0; i < board.length; i++) {
+				board_temp[i] = board[i].clone();
+			}
+			
+			Move m = new Move(playerNumber, pm.x, pm.y);
+			int value = ig.integrateMove(m, board_temp, false);
+			values.add(value);
+			
+			System.out.println("Possible Move: x: " + m.x + " y: " + m.y + " value: " + value);
+			 //TODO: return values and put it into alpha beta
+		}
+
 		return moves;
 	}
 
@@ -191,5 +209,4 @@ public class CalculateMoves {
 		return possibleMoves;
 	}
 
-	
 }

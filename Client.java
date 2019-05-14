@@ -65,8 +65,7 @@ public class Client {
 				client.sendMove(m);
 			} else {
 				System.out.println("Integrate Player " + move + " in the Playfield");
-				
-				ig.integrateMove(move,board);
+				ig.integrateMove(move,board, true);
 			}
 		}
 	}	
