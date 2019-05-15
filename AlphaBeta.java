@@ -1,45 +1,101 @@
+import java.util.List;
+
+import lenz.htw.sawhian.Move;
+
 public class AlphaBeta {
+	
+	//allow min to call max
+	//Variable depth
+	//player list for playernumber min max
+	
+	//alpha beta cut only after max and 3x min
 
-	static int MAX = 1000;
-	static int MIN = -1000;
+	CalculateMoves cv = new CalculateMoves();
 
-	static int alphaBeta(int depth, int nodeIndex, Boolean maximizingPlayer, int values[], int alpha, int beta) {
+	Move savedMoveMax = null;
+	Move saveMoveMin = null;
+	
+	public int max(int[][] board, int depth, IntegrateMove ig, int playerNumber) {
 
-		// stop here, also if time limit is reached
-		if (depth == 4)
-			return values[nodeIndex];
-
-		if (maximizingPlayer) {
-			int best = MIN;
-
-			// Recur for left and
-			// right children
-			for (int i = 0; i < 2; i++) {
-				int val = alphaBeta(depth + 1, nodeIndex * 2 + i, false, values, alpha, beta);
-				best = Math.max(best, val);
-				alpha = Math.max(alpha, best);
-
-				// Alpha Beta Pruning
-				if (beta <= alpha)
-					break;
-			}
-			return best;
-		} else {
-			int best = MAX;
-
-			// Recur for left and
-			// right children
-			for (int i = 0; i < 2; i++) {
-
-				int val = alphaBeta(depth + 1, nodeIndex * 2 + i, true, values, alpha, beta);
-				best = Math.min(best, val);
-				beta = Math.min(beta, best);
-
-				// Alpha Beta Pruning
-				if (beta <= alpha)
-					break;
-			}
-			return best;
+		if (depth == 0) {
+			return ig.evaluateMove(savedMoveMax, board);
 		}
+		
+		int maxValue = -10000;
+		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber, board, ig);
+		int possibleMoves = pm.size();
+		
+		if(pm.isEmpty()) {
+			return ig.evaluateMove(savedMoveMax, board);
+		}
+
+		while (possibleMoves > 0) {
+			
+			int[][] board_copy = copyBoard(board);
+			Move temp_move = new Move(playerNumber, pm.get(possibleMoves).x, pm.get(possibleMoves).y);
+			
+			ig.integrateMove(temp_move, board_copy);
+			
+			//nächster spieler berechnung und wenn playernumber = ich dann max else min
+			
+			int value = min(board_copy, depth - 1, ig, playerNumber+1);
+			
+			board_copy = board;
+			possibleMoves--;
+			
+			if (value > maxValue) {
+				maxValue = value;
+
+				if (depth == 4)
+					savedMoveMax = temp_move;
+			}
+		}
+		return maxValue;
 	}
+	
+	public int min(int[][] board, int depth, IntegrateMove ig, int playerNumber) {
+		
+		if (depth == 0) {
+			return ig.evaluateMove(saveMoveMin, board);
+		}
+		
+		int minValue = 10000;
+		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber, board, ig);
+		int possibleMoves = pm.size();
+		
+		if(pm.isEmpty()) {
+			return ig.evaluateMove(saveMoveMin, board);
+		}
+
+		while (possibleMoves > 0) {
+			
+			int[][] board_copy = copyBoard(board);
+			Move temp_move = new Move(playerNumber, pm.get(possibleMoves).x, pm.get(possibleMoves).y);
+			
+			ig.integrateMove(temp_move, board_copy);
+			
+			int value = min(board_copy, depth - 1, ig, playerNumber+1);
+			
+			board_copy = board;
+			possibleMoves--;
+			
+			if (value < minValue) {
+				minValue = value;
+
+				if (depth == 4)
+					saveMoveMin = temp_move;
+			}
+		}
+		return minValue;
+	}
+
+	public int[][] copyBoard(int[][] board) {
+		// create duplicate of actual board state
+		int[][] temp = new int[board.length][];
+		for (int i = 0; i < board.length; i++) {
+			temp[i] = board[i].clone();
+		}
+		return temp;
+	}
+
 }

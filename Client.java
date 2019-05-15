@@ -2,22 +2,13 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Random;
-
 import javax.imageio.ImageIO;
 
 import lenz.htw.sawhian.Move;
 import lenz.htw.sawhian.net.NetworkClient;
 
 public class Client {
-
-	// TODO: for estimation we need to check how often we can jump @calculating time
-	// TODO: if jump ends at finish
-	//
 
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		Client c = new Client();
@@ -26,19 +17,14 @@ public class Client {
 	int playerNumber = 0;
 	int timeLimit = 0;
 	int latency = 0;
-
-
-
 	int[][] board = new int[7][7];
 
 	public Client() throws IOException, UnknownHostException {
 
 		Arrays.stream(board).forEach(a -> Arrays.fill(a, -1));
-		
-		IntegrateMove ig = new IntegrateMove();
-		CalculateMoves cv = new CalculateMoves();
-		// System.out.println(Arrays.deepToString(board));
 
+		IntegrateMove ig = new IntegrateMove();
+		AlphaBeta ab = new AlphaBeta();
 		BufferedImage logo = ImageIO.read(new File("src/logo.png"));
 
 		// port: 22135
@@ -54,21 +40,19 @@ public class Client {
 			Move move = client.receiveMove();
 
 			if (move == null) {
-				//TODO: 
-				CalculationResult cs = cv.calculateBestMove(playerNumber, board, ig);
-				List<PossibleMove> pm = cs.moves;
-				//int result = alphaBeta(0, 0, true, values, -10000, 10000);
-				
-				Integer maxVal = Collections.max(cs.values);
-				Integer maxIdx = cs.values.indexOf(maxVal);
-				
-				Move m = new Move(playerNumber, pm.get(maxIdx).x, pm.get(maxIdx).y);
-				//System.out.println("My Move is: x: " + pm.x + " y: " + pm.y);
+				//maximise for own player
+				int result = ab.max(board, 4, ig, playerNumber);
+
+				//TODO: get right move for result
+
+				//send new Move
+				Move m = new Move(playerNumber,0,0);
 				client.sendMove(m);
+
 			} else {
 				System.out.println("Integrate Player " + move + " in the Playfield");
-				ig.integrateMove(move,board, true);
+				ig.integrateMove(move, board);
 			}
 		}
-	}	
+	}
 }
