@@ -24,7 +24,7 @@ public class Client {
 		Arrays.stream(board).forEach(a -> Arrays.fill(a, -1));
 
 		IntegrateMove ig = new IntegrateMove();
-		AlphaBeta ab = new AlphaBeta();
+		
 		BufferedImage logo = ImageIO.read(new File("src/logo.png"));
 
 		// port: 22135
@@ -33,6 +33,8 @@ public class Client {
 		playerNumber = client.getMyPlayerNumber();
 		timeLimit = client.getTimeLimitInSeconds();
 		latency = client.getExpectedNetworkLatencyInMilliseconds();
+		
+		AlphaBeta ab = new AlphaBeta(playerNumber);
 
 		System.out.println("Player Number:  " + playerNumber + " Latency in ms: " + latency);
 
@@ -40,18 +42,20 @@ public class Client {
 			Move move = client.receiveMove();
 
 			if (move == null) {
-				//maximise for own player
-				int result = ab.max(board, 4, ig, playerNumber);
 
-				//TODO: get right move for result
+				long startTime = System.currentTimeMillis();
 
-				//send new Move
-				Move m = new Move(playerNumber,0,0);
-				client.sendMove(m);
+				double result = ab.max(board, 2, ig, playerNumber, null);
+
+				long endTime = System.currentTimeMillis();
+				long totalTime = endTime - startTime;
+				System.out.println("Result Move: Player: " + ab.getSavedMoveMax() + " in Time: " + totalTime + "ms");
+
+				Move resultMove = ab.getSavedMoveMax();
+				client.sendMove(resultMove);
 
 			} else {
-				System.out.println("Integrate Player " + move + " in the Playfield");
-				ig.integrateMove(move, board);
+				ig.integrateMove(move, board, true);
 			}
 		}
 	}

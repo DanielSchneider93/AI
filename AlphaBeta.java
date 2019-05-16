@@ -3,90 +3,126 @@ import java.util.List;
 import lenz.htw.sawhian.Move;
 
 public class AlphaBeta {
-	
-	//allow min to call max
-	//Variable depth
-	//player list for playernumber min max
-	
-	//alpha beta cut only after max and 3x min
+
+	// TODO: implement logic if player gets kicked
+
+	// TODO: alpha beta cut only after max and 3x min
+
 
 	CalculateMoves cv = new CalculateMoves();
 
 	Move savedMoveMax = null;
-	Move saveMoveMin = null;
-	
-	public int max(int[][] board, int depth, IntegrateMove ig, int playerNumber) {
+	Move savedMoveMin = null;
+	int myPlayerNumber;
+	int maxDepth = 0;
 
-		if (depth == 0) {
-			return ig.evaluateMove(savedMoveMax, board);
+	public AlphaBeta(int playerNumber) {
+		myPlayerNumber = playerNumber;
+	}
+
+	public double max(int[][] board, int depth, IntegrateMove ig, int playerNumber, Move last_move) {
+
+		int[][] boardToEvaluate = copyBoard(board);
+
+		if (depth == maxDepth) {
+			return ig.evaluateMove(last_move, boardToEvaluate);
 		}
-		
-		int maxValue = -10000;
-		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber, board, ig);
+
+		double maxValue = -10000;
+		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber % 4, board, ig);
+
 		int possibleMoves = pm.size();
-		
-		if(pm.isEmpty()) {
-			return ig.evaluateMove(savedMoveMax, board);
+
+		if (pm.size() == 0) {
+			return ig.evaluateMove(last_move, boardToEvaluate);
+		}
+
+		System.out.println("maximizing, possible moves: " + pm.size());
+
+		if (last_move != null) {
+			ig.integrateMove(last_move, board, false);
 		}
 
 		while (possibleMoves > 0) {
-			
-			int[][] board_copy = copyBoard(board);
-			Move temp_move = new Move(playerNumber, pm.get(possibleMoves).x, pm.get(possibleMoves).y);
-			
-			ig.integrateMove(temp_move, board_copy);
-			
-			//nächster spieler berechnung und wenn playernumber = ich dann max else min
-			
-			int value = min(board_copy, depth - 1, ig, playerNumber+1);
-			
-			board_copy = board;
+			int[][] board_temp = copyBoard(board);
+
+			Move temp_move = new Move(playerNumber % 4, pm.get(possibleMoves - 1).x, pm.get(possibleMoves - 1).y);
+
+			int newPlayerNumber = (playerNumber + 1) % 4;
+
+			double value = min(board_temp, depth - 1, ig, newPlayerNumber, temp_move);
+			System.out.println("value from minimizing: " + value + " move: " + temp_move);
+
 			possibleMoves--;
-			
+
 			if (value > maxValue) {
 				maxValue = value;
 
-				if (depth == 4)
+				if (depth == maxDepth + depth)
 					savedMoveMax = temp_move;
 			}
 		}
 		return maxValue;
 	}
-	
-	public int min(int[][] board, int depth, IntegrateMove ig, int playerNumber) {
-		
-		if (depth == 0) {
-			return ig.evaluateMove(saveMoveMin, board);
-		}
-		
-		int minValue = 10000;
-		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber, board, ig);
-		int possibleMoves = pm.size();
-		
-		if(pm.isEmpty()) {
-			return ig.evaluateMove(saveMoveMin, board);
+
+	public double min(int[][] board, int depth, IntegrateMove ig, int playerNumber, Move last_move) {
+
+		int[][] boardToEvaluate = copyBoard(board);
+
+		if (depth == maxDepth) {
+			return ig.evaluateMove(last_move, boardToEvaluate);
 		}
 
+		double minValue = 10000;
+		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber % 4, board, ig);
+
+		int possibleMoves = pm.size();
+
+		if (pm.size() == 0) {
+			return ig.evaluateMove(last_move, boardToEvaluate);
+		}
+
+		System.out.println("minimizing, possible moves: " + pm.size());
+
+		ig.integrateMove(last_move, board, false);
+
 		while (possibleMoves > 0) {
-			
-			int[][] board_copy = copyBoard(board);
-			Move temp_move = new Move(playerNumber, pm.get(possibleMoves).x, pm.get(possibleMoves).y);
-			
-			ig.integrateMove(temp_move, board_copy);
-			
-			int value = min(board_copy, depth - 1, ig, playerNumber+1);
-			
-			board_copy = board;
+			int[][] board_temp = copyBoard(board);
+
+			Move temp_move = new Move(playerNumber % 4, pm.get(possibleMoves - 1).x, pm.get(possibleMoves - 1).y);
+
+			int newPlayerNumber = (playerNumber + 1) % 4;
+
+			double value;
+
+			if (newPlayerNumber == myPlayerNumber) {
+				value = max(board_temp, depth - 1, ig, newPlayerNumber, temp_move);
+				System.out.println("value from maximizing: " + value);
+			} else
+
+			{
+				value = min(board_temp, depth - 1, ig, newPlayerNumber, temp_move);
+				System.out.println("value from minimizing: " + value);
+			}
+
 			possibleMoves--;
-			
+
 			if (value < minValue) {
 				minValue = value;
 
-				if (depth == 4)
-					saveMoveMin = temp_move;
+				if (depth == maxDepth + 1)
+					savedMoveMin = temp_move;
 			}
 		}
 		return minValue;
+	}
+
+	public Move getSavedMoveMax() {
+		return savedMoveMax;
+	}
+
+	public Move getSavedMoveMin() {
+		return savedMoveMin;
 	}
 
 	public int[][] copyBoard(int[][] board) {
