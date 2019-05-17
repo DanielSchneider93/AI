@@ -42,6 +42,10 @@ public class CalculateMoves {
 										possibleMoves.add(new PossibleMove(x, y));
 									}
 								}
+								if(board[5][y] == playerNumber && board[6][y] != -1 && board[6][y] != playerNumber) {
+									//we can jump off 
+									possibleMoves.add(new PossibleMove(5, y));
+								}
 							}
 						}
 					}
@@ -82,6 +86,10 @@ public class CalculateMoves {
 										// jump possible
 										possibleMoves.add(new PossibleMove(x, y));
 									}
+								}
+								if(board[5][y] == playerNumber && board[6][y] != -1 && board[6][y] != playerNumber) {
+									//we can jump off 
+									possibleMoves.add(new PossibleMove(5, y));
 								}
 
 							}
@@ -124,6 +132,10 @@ public class CalculateMoves {
 										possibleMoves.add(new PossibleMove(x, y));
 									}
 								}
+								if(board[x][1] == playerNumber && board[x][0] != -1 && board[x][0] != playerNumber) {
+									//we can jump off 
+									possibleMoves.add(new PossibleMove(x, 1));
+								}
 							}
 						}
 					}
@@ -163,6 +175,10 @@ public class CalculateMoves {
 										// jump possible
 										possibleMoves.add(new PossibleMove(x, y));
 									}
+								}
+								if(board[1][y] == playerNumber && board[0][y] != -1 && board[0][y] != playerNumber) {
+									//we can jump off 
+									possibleMoves.add(new PossibleMove(1, y));
 								}
 							}
 						}

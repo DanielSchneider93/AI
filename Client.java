@@ -6,35 +6,34 @@ import java.util.Arrays;
 import javax.imageio.ImageIO;
 
 import lenz.htw.sawhian.Move;
+import lenz.htw.sawhian.Server;
 import lenz.htw.sawhian.net.NetworkClient;
 
 public class Client {
 
-	public static void main(String[] args) throws UnknownHostException, IOException {
-		Client c = new Client();
-	}
-
+	//public static void main(String[] args) throws UnknownHostException, IOException {
+	//	Client c1 = new Client("KI", false);
+	//}
+	
+	int calculationDepth = 8;
 	int playerNumber = 0;
 	int timeLimit = 0;
 	int latency = 0;
 	int[][] board = new int[7][7];
 
-	public Client() throws IOException, UnknownHostException {
+	public Client(String name, boolean useLearning) throws IOException, UnknownHostException {
 
 		Arrays.stream(board).forEach(a -> Arrays.fill(a, -1));
-
 		IntegrateMove ig = new IntegrateMove();
-		
 		BufferedImage logo = ImageIO.read(new File("src/logo.png"));
-
 		// port: 22135
-		NetworkClient client = new NetworkClient("localhost", "Team_Daniel", logo);
+		NetworkClient client = new NetworkClient("localhost", name, logo);
 
 		playerNumber = client.getMyPlayerNumber();
 		timeLimit = client.getTimeLimitInSeconds();
 		latency = client.getExpectedNetworkLatencyInMilliseconds();
-		
-		AlphaBeta ab = new AlphaBeta(playerNumber);
+
+		AlphaBeta ab = new AlphaBeta(playerNumber, ig, calculationDepth, useLearning);
 
 		System.out.println("Player Number:  " + playerNumber + " Latency in ms: " + latency);
 
@@ -45,7 +44,7 @@ public class Client {
 
 				long startTime = System.currentTimeMillis();
 
-				double result = ab.max(board, 2, ig, playerNumber, null);
+				ab.max(board, calculationDepth, ig, playerNumber, null);
 
 				long endTime = System.currentTimeMillis();
 				long totalTime = endTime - startTime;

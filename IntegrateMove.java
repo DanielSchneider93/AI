@@ -12,13 +12,6 @@ public class IntegrateMove {
 	int unusedStonesP3 = 7;
 	int unusedStonesP4 = 7;
 
-	//TODO: let the values learn from games :)
-	
-	double c1 = 1.5; // field is empty
-	double c2 = 2.5; // goal for that stone is reached
-	double c3 = 1.3; // factor for jumping points
-	double c4 = 1.2; // jumping of board after jump
-
 	public int integrateMove(Move move, int[][] board, boolean savePointsAndStones) {
 		// integrate move for player 1 (0)
 		if (move.player == 0) {
@@ -170,131 +163,7 @@ public class IntegrateMove {
 		return 0;
 	}
 
-	public double evaluateMove(Move move, int[][] board) {
-		double valueCount = 0;
-		if (move.player == 0) {
-
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				valueCount = valueCount + c1;
-
-			} else if (move.y + 1 > 6) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				valueCount = valueCount + c2;
-
-			} else {
-				// next field is occupied and not by our own stone
-				int jumpCount = jumpCheckP1(move, board);
-				valueCount = valueCount + (jumpCount * c3);
-
-				if (move.y + jumpCount > 6) {
-					// jump ends with putting stone off the field
-					board[move.x][move.y] = -1;
-					valueCount = valueCount + c4;
-				} else {
-					// stone is on the field after jump
-					board[move.x][move.y] = -1;
-					board[move.x][move.y + jumpCount] = move.player;
-				}
-			}
-		}
-
-		// integrate move for player 2 (1)
-		if (move.player == 1) {
-
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				valueCount = valueCount + c1;
-
-			} else if (move.x + 1 > 6) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				valueCount = valueCount + c2;
-
-			} else {
-				// next field is occupied, check if we can jump
-				int jumpCount = jumpCheckP2(move, board);
-				valueCount = valueCount + jumpCount * c3;
-
-				if (move.x + jumpCount >= 7) {
-					// jump ends with putting stone off the field
-					board[move.x][move.y] = -1;
-					valueCount = valueCount + c4;
-				} else {
-					// stone is on the field after jump
-					board[move.x][move.y] = -1;
-					board[move.x + jumpCount][move.y] = move.player;
-				}
-			}
-		}
-
-		// integrate move for player 3 (2)
-		if (move.player == 2) {
-
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				valueCount = valueCount + c1;
-
-			} else if (move.y - 1 < 0) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				valueCount = valueCount + c2;
-
-			} else {
-				// next field is occupied, check if we can jump
-				int jumpCount = jumpCheckP3(move, board);
-				valueCount = valueCount + jumpCount * c3;
-
-				if (move.y - jumpCount < 0) {
-					// jump ends with putting stone off the field
-					board[move.x][move.y] = -1;
-					valueCount = valueCount + c4;
-				} else {
-					// stone is on the field after jump
-					board[move.x][move.y] = -1;
-					board[move.x][move.y - jumpCount] = move.player;
-				}
-			}
-		}
-
-		// integrate move for player 4 (3)
-		if (move.player == 3) {
-
-			if (board[move.x][move.y] == -1) {
-				// field is empty, place stone on it
-				board[move.x][move.y] = move.player;
-				valueCount = valueCount + c1;
-
-			} else if (move.x - 1 < 0) {
-				// stone is at goal
-				board[move.x][move.y] = -1;
-				valueCount = valueCount + c2;
-
-			} else {
-				// next field is occupied, check if we can jump
-				int jumpCount = jumpCheckP4(move, board);
-				valueCount = valueCount + jumpCount * c3;
-
-				if (move.x - jumpCount < 0) {
-					// jump ends with putting stone off the field
-					board[move.x][move.y] = -1;
-					valueCount = valueCount + c4;
-				} else {
-					// stone is on the field after jump
-					board[move.x][move.y] = -1;
-					board[move.x - jumpCount][move.y] = move.player;
-				}
-			}
-		}
-
-		return valueCount;
-	}
-
-	private int jumpCheckP1(Move move, int[][] board) {
+	public int jumpCheckP1(Move move, int[][] board) {
 		int counter = 0;
 
 		// im on field 6, so we jump off the board
@@ -370,7 +239,7 @@ public class IntegrateMove {
 		return counter;
 	}
 
-	private int jumpCheckP2(Move move, int[][] board) {
+	public int jumpCheckP2(Move move, int[][] board) {
 		int counter = 0;
 
 		// im on field 6, so we jump off the board
@@ -446,7 +315,7 @@ public class IntegrateMove {
 		return counter;
 	}
 
-	private int jumpCheckP3(Move move, int[][] board) {
+	public int jumpCheckP3(Move move, int[][] board) {
 		int counter = 0;
 
 		// im on field 2, so we jump off the board
@@ -522,7 +391,7 @@ public class IntegrateMove {
 		return counter;
 	}
 
-	private int jumpCheckP4(Move move, int[][] board) {
+	public int jumpCheckP4(Move move, int[][] board) {
 		int counter = 0;
 
 		// im on field 2, so we jump off the board
@@ -592,7 +461,6 @@ public class IntegrateMove {
 				counter = 2;
 				return counter;
 			}
-
 		}
 
 		return counter;
