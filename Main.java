@@ -7,12 +7,17 @@ public class Main {
 	public static void main(String[] args) throws UnknownHostException, IOException {
 		int evolutions = 0;
 
+
 		do {
+			IntegrateMove ig = new IntegrateMove();
+			FitnessFunction ff = new FitnessFunction(ig);
+			WeightFunction wf = new WeightFunction(true,ff);
+			
 			Thread t1 = new Thread(new Runnable() {
 				public void run() {
 					try {
 						Thread.sleep(1000);
-						Client c1 = new Client("KI", true);
+						Client c1 = new Client("KI", true, wf, ig);
 					} catch (InterruptedException | IOException e) {
 						e.printStackTrace();
 					}
@@ -23,7 +28,7 @@ public class Main {
 				public void run() {
 					try {
 						Thread.sleep(1500);
-						Client c2 = new Client("Bot 1", false);
+						Client c2 = new Client("Bot 1", false, wf, null);
 					} catch (InterruptedException | IOException e) {
 						e.printStackTrace();
 					}
@@ -34,7 +39,7 @@ public class Main {
 				public void run() {
 					try {
 						Thread.sleep(2000);
-						Client c3 = new Client("Bot 2", false);
+						Client c3 = new Client("Bot 2", false, wf, null);
 					} catch (InterruptedException | IOException e) {
 						e.printStackTrace();
 					}
@@ -45,7 +50,7 @@ public class Main {
 				public void run() {
 					try {
 						Thread.sleep(2500);
-						Client c4 = new Client("Bot 3", false);
+						Client c4 = new Client("Bot 3", false, wf, null);
 					} catch (InterruptedException | IOException e) {
 						e.printStackTrace();
 					}
@@ -56,8 +61,11 @@ public class Main {
 			t2.start();
 			t3.start();
 			t4.start();
-			System.out.println("winner: " + Server.runOnceAndReturnTheWinner(1000));
+			int winner = Server.runOnceAndReturnTheWinner(4);
+			System.out.println("winner: " + winner);
+			wf.evaluateBoard(winner);
+			
 			evolutions++;
-		} while (evolutions < 3);
+		} while (evolutions < 10);
 	}
 }

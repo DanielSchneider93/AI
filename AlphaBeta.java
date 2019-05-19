@@ -1,4 +1,3 @@
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
 import lenz.htw.sawhian.Move;
@@ -6,12 +5,14 @@ import lenz.htw.sawhian.Move;
 public class AlphaBeta {
 
 	IntegrateMove ig;
+	WeightFunction wf;
 
-	public AlphaBeta(int playerNumber, IntegrateMove ig, int calculationDepth, boolean useLearning) {
+	public AlphaBeta(int playerNumber, IntegrateMove ig, int calculationDepth, boolean useLearning, WeightFunction wf) {
 		myPlayerNumber = playerNumber;
 		this.ig = ig;
 		topLayer = calculationDepth;
 		this.useLearning = useLearning;
+		this.wf = wf;
 	}
 
 	Move savedMoveMax = null;
@@ -20,44 +21,26 @@ public class AlphaBeta {
 	int topLayer;
 	boolean useLearning;
 
-	// TODO: implement logic if player gets kicked ???
-	// TODO: alpha beta cut only after max and 3x min
-
-	WeightFunction wf = new WeightFunction(useLearning);
 	CalculateMoves cv = new CalculateMoves();
-	FitnessFunction ff = new FitnessFunction();
 
-	public double max(int[][] board, int depth, IntegrateMove ig, int playerNumber, Move last_move)
+	public double max(int[][] board, int depth, IntegrateMove ig, int playerNumber, Move last_move, int alpha, int beta)
 			throws IOException {
 
 		int[][] boardToEvaluate = copyBoard(board);
-		double maxValue = -10000;
+		double maxValue = alpha;
 		int possibleMoves = 0;
 
-		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber % 4, board, ig);
-
-		if (depth == maxDepth || pm.size() == 0) {
-			if (last_move == null) {
-				// no moves left, we either won or are blocked
-				if (myPlayerNumber == 0) {
-					int evaluation = ff.evalutateGame(ig, myPlayerNumber);
-					String text = String.valueOf(evaluation) + " " + wf.c1 + " " + wf.c2 + " " + wf.c3 + " " + wf.c4
-							+ " " + wf.c5;
-					System.out.println(text);
-					
-				    FileWriter fw = new FileWriter("src/results.txt", true);
-				    fw.write(text);
-				    fw.write("\n");
-				    fw.close();
-					
-					return 0;
-				}
+		if (depth == maxDepth) {
+			if (useLearning) {
+				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1_new, wf.c2_new, wf.c3_new, wf.c4_new,
+						wf.c5_new);
+			} else {
+				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1, wf.c2, wf.c3, wf.c4,wf.c5);
 			}
-			if (last_move != null) {
-				return wf.evaluateMove(last_move, boardToEvaluate, ig);
-			}
-
+			
 		}
+
+		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber % 4, board, ig);
 
 		if (last_move != null) {
 			ig.integrateMove(last_move, board, false);
@@ -69,31 +52,42 @@ public class AlphaBeta {
 			Move temp_move = new Move(playerNumber % 4, pm.get(possibleMoves).x, pm.get(possibleMoves).y);
 			int newPlayerNumber = (playerNumber + 1) % 4;
 
-			double value = min(board_temp, depth - 1, ig, newPlayerNumber, temp_move);
+			double value = min(board_temp, depth - 1, ig, newPlayerNumber, temp_move, (int) maxValue, beta);
 
 			possibleMoves++;
 
 			if (value > maxValue) {
 				maxValue = value;
-				if (depth == topLayer)
-					savedMoveMax = temp_move;
 			}
+			if (depth == topLayer)
+				savedMoveMax = temp_move;
+
+			if (maxValue >= beta)
+				break;
+
 		}
 		return maxValue;
 	}
 
-	public double min(int[][] board, int depth, IntegrateMove ig, int playerNumber, Move last_move)
+	public double min(int[][] board, int depth, IntegrateMove ig, int playerNumber, Move last_move, int alpha, int beta)
 			throws IOException {
 
 		int[][] boardToEvaluate = copyBoard(board);
 		int possibleMoves = 0;
-		double minValue = 10000;
-		double maxValue = -10000;
+		double minValue = beta;
+		double maxValue = alpha;
+
+		int minCallCount = 1;
 
 		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber % 4, board, ig);
 
 		if (depth == maxDepth || pm.size() == 0) {
-			return wf.evaluateMove(last_move, boardToEvaluate, ig);
+			if (useLearning) {
+				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1_new, wf.c2_new, wf.c3_new, wf.c4_new,
+						wf.c5_new);
+			} else {
+				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1, wf.c2, wf.c3, wf.c4,wf.c5);
+			}
 		}
 
 		ig.integrateMove(last_move, board, false);
@@ -108,16 +102,22 @@ public class AlphaBeta {
 			double value;
 
 			if (newPlayerNumber == myPlayerNumber) {
-				value = max(board_temp, depth - 1, ig, newPlayerNumber, temp_move);
+				value = max(board_temp, depth - 1, ig, newPlayerNumber, temp_move, alpha, (int) minValue);
 
 				if (value < minValue)
 					minValue = value;
+				if (minValue <= alpha)
+					break;
 
 			} else {
-				value = min(board_temp, depth - 1, ig, newPlayerNumber, temp_move);
-
+				value = min(board_temp, depth - 1, ig, newPlayerNumber, temp_move, (int) maxValue, beta);
+				minCallCount++;
 				if (value > maxValue)
 					minValue = value;
+				if (minCallCount == 3) {
+					if (maxValue >= beta)
+						break;
+				}
 			}
 			possibleMoves++;
 		}
