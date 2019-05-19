@@ -12,25 +12,28 @@ public class WeightFunction {
 	FitnessFunction ff;
 	boolean useLearning = false;
 	int valueOfLastGame = 0;
+	double maxValueSizeForLearning = 3;
 
-	double c1; // field is empty
-	double c2; // goal for that stone is reached
-	double c3; // factor for jumping points
-	double c4; // jumping of board after jump
-	double c5; // multiplicator for too much stones at the line
-	
+	double c1 = 1; // field is empty
+	double c2 = 2.5; // goal for that stone is reached
+	double c3 = 1.7; // factor for jumping points
+	double c4 = 3; // jumping of board after jump
+	double c5 = 2; // multiplicator for too much stones at the line
+
 	double c1_new; // field is empty
 	double c2_new; // goal for that stone is reached
 	double c3_new; // factor for jumping points
 	double c4_new; // jumping of board after jump
 	double c5_new; // multiplicator for too much stones at the line
-	
-	public WeightFunction(boolean useLearning, FitnessFunction ff) throws IOException {
 
-		this.ff = ff;
-		BufferedReader br = null;
-		this.useLearning = useLearning;
-		
+	public WeightFunction(boolean useLearning, FitnessFunction ff, boolean actuallyLearn) throws IOException {
+
+		if (useLearning) {
+
+			this.ff = ff;
+			BufferedReader br = null;
+			this.useLearning = useLearning;
+
 			// load last best configuration from file
 			try {
 				br = new BufferedReader(new FileReader("src/results.txt"));
@@ -42,25 +45,31 @@ public class WeightFunction {
 			st = br.readLine();
 			String s[] = st.split(", ");
 			double out[] = new double[s.length];
-			for (int i = 0; i < s.length; i++) 
+			for (int i = 0; i < s.length; i++)
 				out[i] = Double.parseDouble(s[i]);
+
 			
 			c1 = out[1];
 			c2 = out[2];
 			c3 = out[3];
 			c4 = out[4];
 			c5 = out[5];
-					
-	if (useLearning) {		
-			//randomize last values
-			valueOfLastGame = (int) out[0];
-			c1_new = out[1] + getRandomDouble();
-			c2_new = out[2] + getRandomDouble();
-			c3_new = out[3] + getRandomDouble();
-			c4_new = out[4] + getRandomDouble();
-			c5_new = out[5] + getRandomDouble();
-			
-			System.out.println("new randomized cX: " + c1_new + ", " + c2_new + ", " + c3_new + ", " + c4_new + ", " + c5_new);
+
+			//only randomize if we actually learn, else, only take the "best" values from file
+			if (actuallyLearn) {
+				maxValueSizeForLearning = maxValueSizeForLearning * 0.85;
+
+				// randomize last values
+				valueOfLastGame = (int) out[0];
+				c1_new = out[1] + getRandomDouble();
+				c2_new = out[2] + getRandomDouble();
+				c3_new = out[3] + getRandomDouble();
+				c4_new = out[4] + getRandomDouble();
+				c5_new = out[5] + getRandomDouble();
+
+				System.out.println(
+						"new randomized cX: " + c1_new + ", " + c2_new + ", " + c3_new + ", " + c4_new + ", " + c5_new);
+			}
 		}
 	}
 
@@ -68,31 +77,29 @@ public class WeightFunction {
 		int evaluation = ff.evalutateGame(winner);
 		String text;
 		System.out.println("old value " + valueOfLastGame + " new value " + evaluation);
-		
-		//check which generation has besser  result and save it for next run
-		if(valueOfLastGame > evaluation) {
+
+		// check which generation has besser result and save it for next run
+		if (valueOfLastGame > evaluation) {
 			text = String.valueOf(valueOfLastGame) + ", " + c1 + ", " + c2 + ", " + c3 + ", " + c4 + ", " + c5;
-		}else {
-			text = String.valueOf(evaluation) + ", " + c1_new + ", " + c2_new + ", " + c3_new + ", " + c4_new + ", " + c5_new;
+		} else {
+			text = String.valueOf(evaluation) + ", " + c1_new + ", " + c2_new + ", " + c3_new + ", " + c4_new + ", "
+					+ c5_new;
 		}
-		
+
 		System.out.println("new cX: " + text);
-		
+
 		FileWriter fw = new FileWriter("src/results.txt");
 		fw.write(text);
 		fw.close();
 	}
-	
+
 	public double getRandomDouble() {
-		double randomBetweenZeroAndThree = ThreadLocalRandom.current().nextDouble(0, 3);
-		
-		if(ThreadLocalRandom.current().nextInt(2) == 0)
+		double randomBetweenZeroAndThree = ThreadLocalRandom.current().nextDouble(0, maxValueSizeForLearning);
 			return randomBetweenZeroAndThree;
-		else
-			return -randomBetweenZeroAndThree;
 	}
 
-	public double evaluateMove(Move move, int[][] board, IntegrateMove ig, double x1, double x2, double x3 , double x4, double x5) {
+	public double evaluateMove(Move move, int[][] board, IntegrateMove ig, double x1, double x2, double x3, double x4,
+			double x5) {
 		double valueCount = 0;
 		if (move.player == 0) {
 

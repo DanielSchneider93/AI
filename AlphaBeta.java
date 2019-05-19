@@ -32,12 +32,13 @@ public class AlphaBeta {
 
 		if (depth == maxDepth) {
 			if (useLearning) {
+				//if we use learning we have to use the randomized values
 				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1_new, wf.c2_new, wf.c3_new, wf.c4_new,
 						wf.c5_new);
 			} else {
-				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1, wf.c2, wf.c3, wf.c4,wf.c5);
+				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1, wf.c2, wf.c3, wf.c4, wf.c5);
 			}
-			
+
 		}
 
 		List<PossibleMove> pm = cv.getPossibleMoves(playerNumber % 4, board, ig);
@@ -86,7 +87,7 @@ public class AlphaBeta {
 				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1_new, wf.c2_new, wf.c3_new, wf.c4_new,
 						wf.c5_new);
 			} else {
-				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1, wf.c2, wf.c3, wf.c4,wf.c5);
+				return wf.evaluateMove(last_move, boardToEvaluate, ig, wf.c1, wf.c2, wf.c3, wf.c4, wf.c5);
 			}
 		}
 
@@ -130,7 +131,6 @@ public class AlphaBeta {
 	}
 
 	public int[][] copyBoard(int[][] board) {
-		// create duplicate of actual board state
 		int[][] temp = new int[board.length][];
 		for (int i = 0; i < board.length; i++) {
 			temp[i] = board[i].clone();

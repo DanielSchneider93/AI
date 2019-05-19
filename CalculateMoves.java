@@ -8,7 +8,7 @@ public class CalculateMoves {
 		// make new list of possible Moves
 		List<PossibleMove> possibleMoves = new ArrayList<PossibleMove>();
 
-		// Player 1 -----------------------------------------------------------------
+		// Player 1 
 		if (playerNumber == 0) {
 			// check if free slots to place stones
 			for (int z = 0; z < 7; z++) {
@@ -42,8 +42,8 @@ public class CalculateMoves {
 										possibleMoves.add(new PossibleMove(x, y));
 									}
 								}
-								if(board[5][y] == playerNumber && board[6][y] != -1 && board[6][y] != playerNumber) {
-									//we can jump off 
+								if (board[5][y] == playerNumber && board[6][y] != -1 && board[6][y] != playerNumber) {
+									// we can jump off
 									possibleMoves.add(new PossibleMove(5, y));
 								}
 							}
@@ -52,7 +52,7 @@ public class CalculateMoves {
 				}
 			}
 		}
-		// Player 2 -----------------------------------------------------------------
+		// Player 2
 		if (playerNumber == 1) {
 			// check if free slots to place stones
 			for (int z = 0; z < 7; z++) {
@@ -87,8 +87,8 @@ public class CalculateMoves {
 										possibleMoves.add(new PossibleMove(x, y));
 									}
 								}
-								if(board[5][y] == playerNumber && board[6][y] != -1 && board[6][y] != playerNumber) {
-									//we can jump off 
+								if (board[5][y] == playerNumber && board[6][y] != -1 && board[6][y] != playerNumber) {
+									// we can jump off
 									possibleMoves.add(new PossibleMove(5, y));
 								}
 
@@ -98,7 +98,7 @@ public class CalculateMoves {
 				}
 			}
 		}
-		// Player 3 -----------------------------------------------------------------
+		// Player 3
 		if (playerNumber == 2) {
 			// check if free slots to place stones
 			for (int z = 0; z < 7; z++) {
@@ -132,8 +132,8 @@ public class CalculateMoves {
 										possibleMoves.add(new PossibleMove(x, y));
 									}
 								}
-								if(board[x][1] == playerNumber && board[x][0] != -1 && board[x][0] != playerNumber) {
-									//we can jump off 
+								if (board[x][1] == playerNumber && board[x][0] != -1 && board[x][0] != playerNumber) {
+									// we can jump off
 									possibleMoves.add(new PossibleMove(x, 1));
 								}
 							}
@@ -142,7 +142,7 @@ public class CalculateMoves {
 				}
 			}
 		}
-		// Player 4 -----------------------------------------------------------------
+		// Player 4
 		if (playerNumber == 3) {
 			// check if free slots to place stones
 			for (int z = 0; z < 7; z++) {
@@ -176,8 +176,8 @@ public class CalculateMoves {
 										possibleMoves.add(new PossibleMove(x, y));
 									}
 								}
-								if(board[1][y] == playerNumber && board[0][y] != -1 && board[0][y] != playerNumber) {
-									//we can jump off 
+								if (board[1][y] == playerNumber && board[0][y] != -1 && board[0][y] != playerNumber) {
+									// we can jump off
 									possibleMoves.add(new PossibleMove(1, y));
 								}
 							}

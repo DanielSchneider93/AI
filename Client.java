@@ -20,15 +20,16 @@ public class Client {
 	WeightFunction wf;
 	IntegrateMove ig;
 
-	int calculationDepth = 8;
+	int calculationDepth = 0;
 	int playerNumber = 0;
 	int timeLimit = 0;
 	int latency = 0;
 	int[][] board = new int[7][7];
 
-	public Client(String name, boolean useLearning, WeightFunction wf, IntegrateMove igFromMain)
+	public Client(String name, boolean useLearning, WeightFunction wf, IntegrateMove igFromMain, int calculationDepth)
 			throws IOException, UnknownHostException {
 		this.wf = wf;
+		this.calculationDepth = calculationDepth;
 
 		if (igFromMain == null) {
 			ig = new IntegrateMove();
@@ -44,6 +45,7 @@ public class Client {
 
 		playerNumber = client.getMyPlayerNumber();
 		if (name == "KI") {
+			//if KI set correct player Number for boardevaluation at end of game
 			wf.ff.playerNumber = playerNumber;
 		}
 		timeLimit = client.getTimeLimitInSeconds();
